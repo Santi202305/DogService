@@ -1,4 +1,4 @@
-package co.empresa.productoservice.model.entities;
+package co.edu.uceva.dogservice.model.entities;
 
 
 import jakarta.persistence.Entity;
