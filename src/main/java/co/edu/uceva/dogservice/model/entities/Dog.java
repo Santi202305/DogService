@@ -14,13 +14,29 @@ public class Dog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty(message = "El nombre no puede estar vacío")
-    @Size(min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres")
+    @NotEmpty(message = "No puede estar vacío")
+    @Size(min = 2, max = 20, message = "El tamaño tiene que estar entre 2 y 20")
     @Column(nullable = false)
     private String nombre;
 
     @Size(max = 255, message = "La descripción no puede tener más de 255 caracteres")
     private String descripcion;
+
+    @Min(value = 0, message = "El precio no puede ser negativo")
+    @NotNull(message = "El precio es obligatorio")
+    @Column(nullable = false)
+    private Double precio;
+
+    @NotNull(message = "El stock no puede ser nulo")
+    @Min(value = 0, message = "El stock no puede ser negativo")
+    private Integer stock;
+
+    @Size(max = 100, message = "El nombre del archivo no puede exceder los 100 caracteres")
+    @Pattern(
+            regexp = "^[\\w\\s\\-\\.\\(\\)]+\\.(jpg|jpeg|png|gif|bmp|webp)$",
+            message = "El nombre del archivo debe ser válido y tener una extensión permitida"
+    )
+    private String foto;
 
     @NotEmpty(message = "La raza no puede estar vacía")
     @Size(min = 2, max = 50, message = "La raza debe tener entre 2 y 50 caracteres")
@@ -32,12 +48,6 @@ public class Dog {
     @Max(value = 25, message = "La edad no puede ser mayor a 25 años")
     @Column(nullable = false)
     private Integer edad;
-
-    @NotNull(message = "El peso es obligatorio")
-    @DecimalMin(value = "0.1", inclusive = true, message = "El peso debe ser mayor a 0")
-    @DecimalMax(value = "100.0", inclusive = true, message = "El peso no puede ser mayor a 100 kg")
-    @Column(nullable = false)
-    private Double peso;
 
     @NotEmpty(message = "El color no puede estar vacío")
     @Size(min = 2, max = 30, message = "El color debe tener entre 2 y 30 caracteres")
