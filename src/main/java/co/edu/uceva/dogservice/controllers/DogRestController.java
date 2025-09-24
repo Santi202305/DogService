@@ -2,12 +2,14 @@ package co.edu.uceva.dogservice.controllers;
 
 import co.edu.uceva.dogservice.model.entities.Dog;
 import co.edu.uceva.dogservice.model.service.IDogService;
+import jakarta.validation.Valid;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/dog-service")
 public class DogRestController {
 
-
+    // Declaramos como final el servicio para mejorar la inmutabilidad
     private final IDogService dogService;
 
     private static final String ERROR = "error";
@@ -26,26 +28,28 @@ public class DogRestController {
     private static final String DOG = "dog";
     private static final String DOGS = "dogs";
 
-
+    // Inyección de dependencia del servicio que proporciona servicios de CRUD
     public DogRestController(IDogService dogService) {
         this.dogService = dogService;
     }
 
-
-    @GetMapping("/dog")
-    public ResponseEntity<Map<String, Object>> getDog() {
+    /**
+     * Listar todos los dogs.
+     */
+    @GetMapping("/dogs")
+    public ResponseEntity<Map<String, Object>> getDogs() {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<Dog> dog = dogService.findAll();
+            List<Dog> dogs = dogService.findAll();
 
-            if (dog.isEmpty()) {
+            if (dogs.isEmpty()) {
                 response.put(MENSAJE, "No hay dogs en la base de datos.");
-                response.put(DOGS, dog);
-                return ResponseEntity.status(HttpStatus.OK).body(response);
+                response.put(DOGS, dogs); // para que sea siempre el mismo campo
+                return ResponseEntity.status(HttpStatus.OK).body(response); // 200 pero lista vacía
             }
 
-            response.put(DOGS, dog);
+            response.put(DOGS, dogs);
             return ResponseEntity.ok(response);
 
         } catch (DataAccessException e) {
@@ -55,21 +59,23 @@ public class DogRestController {
         }
     }
 
-
+    /**
+     * Listar dogs con paginación.
+     */
     @GetMapping("/dog/page/{page}")
     public ResponseEntity<Object> index(@PathVariable Integer page) {
         Map<String, Object> response = new HashMap<>();
         Pageable pageable = PageRequest.of(page, 4);
 
         try {
-            Page<Dog> productos = dogService.findAll(pageable);
+            Page<Dog> dogs = dogService.findAll(pageable);
 
-            if (productos.isEmpty()) {
-                response.put(MENSAJE, "No hay dog en la página solicitada.");
+            if (dogs.isEmpty()) {
+                response.put(MENSAJE, "No hay dogs en la página solicitada.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            return ResponseEntity.ok(productos);
+            return ResponseEntity.ok(dogs);
 
         } catch (DataAccessException e) {
             response.put(MENSAJE, "Error al consultar la base de datos.");
@@ -81,13 +87,25 @@ public class DogRestController {
         }
     }
 
-
-    @PostMapping("/dog")
-    public ResponseEntity<Map<String, Object>> save(@RequestBody Dog dog) {
+    /**
+     * Crear un nuevo dog pasando el objeto en el cuerpo de la petición, usando validaciones
+     */
+    @PostMapping("/dogs")
+    public ResponseEntity<Map<String, Object>> save(@Valid @RequestBody Dog dog, BindingResult result) {
         Map<String, Object> response = new HashMap<>();
 
-        try {
+        if (result.hasErrors()) {
+            List<String> errors = result.getFieldErrors()
+                    .stream()
+                    .map(err -> "El campo '" + err.getField() + "' " + err.getDefaultMessage())
+                    .toList();
 
+            response.put("errors", errors);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            // Guardar el dog en la base de datos
             Dog nuevoDog = dogService.save(dog);
 
             response.put(MENSAJE, "El dog ha sido creado con éxito!");
@@ -101,14 +119,16 @@ public class DogRestController {
         }
     }
 
-
-    @DeleteMapping("/dog")
+    /**
+     * Eliminar un dog pasando el objeto en el cuerpo de la petición.
+     */
+    @DeleteMapping("/dogs")
     public ResponseEntity<Map<String, Object>> delete(@RequestBody Dog dog) {
         Map<String, Object> response = new HashMap<>();
         try {
             Dog dogExistente = dogService.findById(dog.getId());
             if (dogExistente == null) {
-                response.put(MENSAJE, "El producto ID: " + dog.getId() + " no existe en la base de datos.");
+                response.put(MENSAJE, "El dog ID: " + dog.getId() + " no existe en la base de datos.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
@@ -122,19 +142,32 @@ public class DogRestController {
         }
     }
 
-
-    @PutMapping("/dog")
-    public ResponseEntity<Map<String, Object>> update(@RequestBody Dog dog) {
+    /**
+     * Actualizar un dog pasando el objeto en el cuerpo de la petición.
+     * @param dog: Objeto Dog que se va a actualizar
+     */
+    @PutMapping("/dogs")
+    public ResponseEntity<Map<String, Object>> update(@Valid @RequestBody Dog dog, BindingResult result) {
         Map<String, Object> response = new HashMap<>();
 
-        try {
+        if (result.hasErrors()) {
+            List<String> errors = result.getFieldErrors()
+                    .stream()
+                    .map(err -> "El campo '" + err.getField() + "' " + err.getDefaultMessage())
+                    .toList();
 
+            response.put("errors", errors);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            // Verificar si el dog existe antes de actualizar
             if (dogService.findById(dog.getId()) == null) {
                 response.put(MENSAJE, "Error: No se pudo editar, el dog ID: " + dog.getId() + " no existe en la base de datos.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-
+            // Guardar directamente el dog actualizado en la base de datos
             Dog dogActualizado = dogService.save(dog);
 
             response.put(MENSAJE, "El dog ha sido actualizado con éxito!");
@@ -142,14 +175,16 @@ public class DogRestController {
             return ResponseEntity.ok(response);
 
         } catch (DataAccessException e) {
-            response.put(MENSAJE, "Error al actualizar el producto en la base de datos.");
+            response.put(MENSAJE, "Error al actualizar el dog en la base de datos.");
             response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-
-    @GetMapping("/dog/{id}")
+    /**
+     * Obtener un dog por su ID.
+     */
+    @GetMapping("/dogs/{id}")
     public ResponseEntity<Map<String, Object>> findById(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -161,7 +196,7 @@ public class DogRestController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            response.put(MENSAJE, "El dog ha sido actualizado con éxito!");
+            response.put(MENSAJE, "El dog ha sido encontrado con éxito!");
             response.put(DOG, dog);
             return ResponseEntity.ok(response);
 
@@ -171,5 +206,4 @@ public class DogRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
 }
