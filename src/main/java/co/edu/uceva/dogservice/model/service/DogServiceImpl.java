@@ -2,14 +2,13 @@ package co.edu.uceva.dogservice.model.service;
 
 import co.edu.uceva.dogservice.model.entities.Dog;
 import co.edu.uceva.dogservice.model.repository.IDogRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Clase que implementa los métodos de la interfaz IProductoService
- * para realizar las operaciones de negocio sobre la entidad Producto
- */
 @Service
 public class DogServiceImpl implements IDogService {
 
@@ -20,28 +19,40 @@ public class DogServiceImpl implements IDogService {
     }
 
     @Override
+    @Transactional
     public Dog save(Dog dog) {
         return dogRepository.save(dog);
     }
 
     @Override
+    @Transactional
     public void delete(Dog dog) {
         dogRepository.delete(dog);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Dog findById(Long id) {
         return dogRepository.findById(id).orElse(null);
     }
 
     @Override
+    @Transactional
     public Dog update(Dog dog) {
         return dogRepository.save(dog);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Dog> findAll() {
         return (List<Dog>) dogRepository.findAll();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Dog> findAll(Pageable pageable) {
+        return dogRepository.findAll(pageable);
+    }
 }
+
 
