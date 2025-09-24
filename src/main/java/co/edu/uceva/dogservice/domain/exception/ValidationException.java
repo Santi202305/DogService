@@ -1,7 +1,11 @@
 package co.edu.uceva.dogservice.domain.exception;
 
-public class NoHayDogException extends RuntimeException {
-    public NoHayDogException(String message) {
-        super(message);
+import org.springframework.validation.BindingResult;
+
+public class ValidationException extends RuntimeException {
+    public final BindingResult result;
+    public ValidationException(BindingResult result) {
+        super("Error de validacion de datos.");
+        this.result = result;
     }
 }

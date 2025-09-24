@@ -1,4 +1,4 @@
-package co.edu.uceva.dogservice.delivery;
+package co.edu.uceva.dogservice.delivery.rest;
 
 import co.edu.uceva.dogservice.domain.model.Dog;
 import co.edu.uceva.dogservice.domain.service.IDogService;
