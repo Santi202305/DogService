@@ -20,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/dog-service")
 public class DogRestController {
 
-    // Declaramos como final el servicio para mejorar la inmutabilidad
+
     private final IDogService dogService;
 
     private static final String ERROR = "error";
@@ -28,14 +28,12 @@ public class DogRestController {
     private static final String DOG = "dog";
     private static final String DOGS = "dogs";
 
-    // Inyección de dependencia del servicio que proporciona servicios de CRUD
+
     public DogRestController(IDogService dogService) {
         this.dogService = dogService;
     }
 
-    /**
-     * Listar todos los dogs.
-     */
+
     @GetMapping("/dogs")
     public ResponseEntity<Map<String, Object>> getDogs() {
         Map<String, Object> response = new HashMap<>();
@@ -60,9 +58,7 @@ public class DogRestController {
         }
     }
 
-    /**
-     * Listar dogs con paginación.
-     */
+
     @GetMapping("/dog/page/{page}")
     public ResponseEntity<Object> index(@PathVariable Integer page) {
         Map<String, Object> response = new HashMap<>();
@@ -89,9 +85,7 @@ public class DogRestController {
         }
     }
 
-    /**
-     * Crear un nuevo dog pasando el objeto en el cuerpo de la petición.
-     */
+
     @PostMapping("/dogs")
     public ResponseEntity<Map<String, Object>> save(@Valid @RequestBody Dog dog, BindingResult result) {
         Map<String, Object> response = new HashMap<>();
@@ -121,9 +115,7 @@ public class DogRestController {
         }
     }
 
-    /**
-     * Eliminar un dog pasando el objeto en el cuerpo de la petición.
-     */
+
     @DeleteMapping("/dogs")
     public ResponseEntity<Map<String, Object>> delete(@RequestBody Dog dog) {
         Map<String, Object> response = new HashMap<>();
@@ -146,9 +138,7 @@ public class DogRestController {
         }
     }
 
-    /**
-     * Actualizar un dog pasando el objeto en el cuerpo de la petición.
-     */
+
     @PutMapping("/dogs")
     public ResponseEntity<Map<String, Object>> update(@Valid @RequestBody Dog dog, BindingResult result) {
         Map<String, Object> response = new HashMap<>();
