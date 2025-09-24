@@ -1,7 +1,7 @@
-package co.edu.uceva.dogservice.controllers;
+package co.edu.uceva.dogservice.delivery;
 
-import co.edu.uceva.dogservice.model.entities.Dog;
-import co.edu.uceva.dogservice.model.service.IDogService;
+import co.edu.uceva.dogservice.domain.model.Dog;
+import co.edu.uceva.dogservice.domain.service.IDogService;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;

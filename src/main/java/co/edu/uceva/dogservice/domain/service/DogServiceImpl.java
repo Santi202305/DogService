@@ -1,7 +1,7 @@
-package co.edu.uceva.dogservice.model.service;
+package co.edu.uceva.dogservice.domain.service;
 
-import co.edu.uceva.dogservice.model.entities.Dog;
-import co.edu.uceva.dogservice.model.repository.IDogRepository;
+import co.edu.uceva.dogservice.domain.model.Dog;
+import co.edu.uceva.dogservice.domain.repository.IDogRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

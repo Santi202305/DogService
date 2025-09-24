@@ -1,4 +1,4 @@
-package co.edu.uceva.dogservice.model.entities;
+package co.edu.uceva.dogservice.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
