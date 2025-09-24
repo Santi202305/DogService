@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Dog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,8 +34,8 @@ public class Dog {
     private Integer edad;
 
     @NotNull(message = "El peso es obligatorio")
-    @DecimalMin(value = "0.1", message = "El peso debe ser mayor a 0")
-    @DecimalMax(value = "100.0", message = "El peso no puede ser mayor a 100 kg")
+    @DecimalMin(value = "0.1", inclusive = true, message = "El peso debe ser mayor a 0")
+    @DecimalMax(value = "100.0", inclusive = true, message = "El peso no puede ser mayor a 100 kg")
     @Column(nullable = false)
     private Double peso;
 
@@ -45,7 +46,7 @@ public class Dog {
 
     @NotEmpty(message = "El sexo es obligatorio")
     @Pattern(regexp = "^(Macho|Hembra)$", message = "El sexo debe ser 'Macho' o 'Hembra'")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 6)
     private String sexo;
 
     @NotNull(message = "El estado de vacunación es obligatorio")

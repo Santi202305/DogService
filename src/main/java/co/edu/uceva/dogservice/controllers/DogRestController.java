@@ -45,8 +45,8 @@ public class DogRestController {
 
             if (dogs.isEmpty()) {
                 response.put(MENSAJE, "No hay dogs en la base de datos.");
-                response.put(DOGS, dogs); // para que sea siempre el mismo campo
-                return ResponseEntity.status(HttpStatus.OK).body(response); // 200 pero lista vacía
+                response.put(DOGS, dogs); // siempre devuelve el campo "dogs"
+                return ResponseEntity.ok(response); // 200 pero lista vacía
             }
 
             response.put(DOGS, dogs);
@@ -54,7 +54,8 @@ public class DogRestController {
 
         } catch (DataAccessException e) {
             response.put(MENSAJE, "Error al consultar la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+            response.put(ERROR, e.getMessage().concat(": ")
+                    .concat(e.getMostSpecificCause().getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -79,7 +80,8 @@ public class DogRestController {
 
         } catch (DataAccessException e) {
             response.put(MENSAJE, "Error al consultar la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+            response.put(ERROR, e.getMessage().concat(": ")
+                    .concat(e.getMostSpecificCause().getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         } catch (IllegalArgumentException e) {
             response.put(MENSAJE, "Número de página inválido.");
@@ -88,7 +90,7 @@ public class DogRestController {
     }
 
     /**
-     * Crear un nuevo dog pasando el objeto en el cuerpo de la petición, usando validaciones
+     * Crear un nuevo dog pasando el objeto en el cuerpo de la petición.
      */
     @PostMapping("/dogs")
     public ResponseEntity<Map<String, Object>> save(@Valid @RequestBody Dog dog, BindingResult result) {
@@ -101,11 +103,10 @@ public class DogRestController {
                     .toList();
 
             response.put("errors", errors);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         try {
-            // Guardar el dog en la base de datos
             Dog nuevoDog = dogService.save(dog);
 
             response.put(MENSAJE, "El dog ha sido creado con éxito!");
@@ -114,7 +115,8 @@ public class DogRestController {
 
         } catch (DataAccessException e) {
             response.put(MENSAJE, "Error al insertar el dog en la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+            response.put(ERROR, e.getMessage().concat(": ")
+                    .concat(e.getMostSpecificCause().getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -135,16 +137,17 @@ public class DogRestController {
             dogService.delete(dog);
             response.put(MENSAJE, "El dog ha sido eliminado con éxito!");
             return ResponseEntity.ok(response);
+
         } catch (DataAccessException e) {
             response.put(MENSAJE, "Error al eliminar el dog de la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+            response.put(ERROR, e.getMessage().concat(": ")
+                    .concat(e.getMostSpecificCause().getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
     /**
      * Actualizar un dog pasando el objeto en el cuerpo de la petición.
-     * @param dog: Objeto Dog que se va a actualizar
      */
     @PutMapping("/dogs")
     public ResponseEntity<Map<String, Object>> update(@Valid @RequestBody Dog dog, BindingResult result) {
@@ -157,17 +160,15 @@ public class DogRestController {
                     .toList();
 
             response.put("errors", errors);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         try {
-            // Verificar si el dog existe antes de actualizar
             if (dogService.findById(dog.getId()) == null) {
                 response.put(MENSAJE, "Error: No se pudo editar, el dog ID: " + dog.getId() + " no existe en la base de datos.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            // Guardar directamente el dog actualizado en la base de datos
             Dog dogActualizado = dogService.save(dog);
 
             response.put(MENSAJE, "El dog ha sido actualizado con éxito!");
@@ -176,7 +177,8 @@ public class DogRestController {
 
         } catch (DataAccessException e) {
             response.put(MENSAJE, "Error al actualizar el dog en la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+            response.put(ERROR, e.getMessage().concat(": ")
+                    .concat(e.getMostSpecificCause().getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -202,7 +204,8 @@ public class DogRestController {
 
         } catch (DataAccessException e) {
             response.put(MENSAJE, "Error al consultar la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+            response.put(ERROR, e.getMessage().concat(": ")
+                    .concat(e.getMostSpecificCause().getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
